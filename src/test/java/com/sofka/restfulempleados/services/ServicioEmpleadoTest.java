@@ -1,0 +1,78 @@
+package com.sofka.restfulempleados.services;
+
+import com.sofka.restfulempleados.collections.Empleado;
+import com.sofka.restfulempleados.dtos.EmpleadoDTO;
+import com.sofka.restfulempleados.repositories.RepositorioEmpleado;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.util.ArrayList;
+
+import static org.mockito.ArgumentMatchers.any;
+
+
+@SpringBootTest
+class ServicioEmpleadoTest {
+
+    @MockBean
+    private RepositorioEmpleado repositorioEmpleado;
+
+    @Autowired
+    private ServicioEmpleado servicioEmpleado;
+
+    @Test
+    @DisplayName("Test findAll Success")
+    public void obtenerTodos() {
+        
+        var empleadoUno = new Empleado();
+        empleadoUno.setId("1111");
+        empleadoUno.setNombre("Jorge Ramirez");
+        empleadoUno.setRol("Gerente");
+        
+        var empleadoDos = new Empleado();
+        empleadoDos.setId("2222");
+        empleadoDos.setNombre("Pedro Contreras");
+        empleadoDos.setRol("Vicepresidente");
+        
+        var lista = new ArrayList<Empleado>();
+        lista.add(empleadoUno);
+        lista.add(empleadoDos);
+
+        Mockito.when(repositorioEmpleado.findAll()).thenReturn(lista);
+
+        var resultado = servicioEmpleado.obtenerTodos();
+
+        Assertions.assertEquals(2, resultado.size());
+        Assertions.assertEquals(empleadoUno.getNombre(), resultado.get(0).getNombre());
+        Assertions.assertEquals(empleadoDos.getNombre(), resultado.get(1).getNombre());
+    }
+
+    @Test
+    @DisplayName("Test save Success")
+    public void crear() {
+
+        var dato1 = new Empleado();
+        dato1.setId("1111");
+        dato1.setNombre("Jorge Ramirez");
+        dato1.setRol("Gerente");
+
+        var dato2 = new EmpleadoDTO();
+        dato2.setNombre("Jorge Ramirez");
+        dato2.setRol("Gerente");
+
+        Mockito.when(repositorioEmpleado.save(any())).thenReturn(dato1);
+
+        var resultado = servicioEmpleado.crear(dato2);
+
+        Assertions.assertNotNull(resultado, "el valor guardado no debe ser nulo");
+
+        Assertions.assertEquals(dato1.getNombre(), resultado.getNombre(), "el nombre no corresponde");
+        Assertions.assertEquals(dato1.getRol(), resultado.getRol(), "el rol no corresponde");
+    }
+
+}
